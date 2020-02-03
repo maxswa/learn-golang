@@ -20,19 +20,29 @@ func main() {
 		os.Exit(1)
 	}
 
-	downloader, derr := aws.NewS3Downloader()
+	downloader, err := aws.NewS3Downloader()
 
-	if derr != nil {
-		log.Printf("Could not connect to S3: %s\n", derr)
+	if err != nil {
+		log.Printf("Could not connect to S3: %s\n", err)
+		os.Exit(1)
+	}
+
+	client, err := aws.NewS3Client()
+
+	if err != nil {
+		log.Printf("Could not connect to S3: %s\n", err)
 		os.Exit(1)
 	}
 
 	// Routes
-	r.POST("/images/upload", func(c *gin.Context) {
+	r.POST("/images/upload/:user", func(c *gin.Context) {
 		handler.ImageUpload(c, uploader)
 	})
-	r.GET("/images/download/:name", func(c *gin.Context) {
+	r.GET("/images/download/:user/:name", func(c *gin.Context) {
 		handler.ImageDownload(c, downloader)
+	})
+	r.GET("/images/list/:user", func(c *gin.Context) {
+		handler.ListFiles(c, client)
 	})
 
 	// Listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
