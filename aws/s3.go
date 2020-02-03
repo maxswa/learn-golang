@@ -25,3 +25,21 @@ func NewS3Uploader() (*s3manager.Uploader, error) {
 		return uploader, nil
 	}
 }
+
+func NewS3Downloader() (*s3manager.Downloader, error) {
+
+	sess, err := session.NewSessionWithOptions(session.Options{
+		Profile: "idelic-dev",
+		Config: aws.Config{
+			Region: aws.String("us-east-2"),
+		},
+	})
+
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Error creating new AWS session: %s", err))
+	} else {
+		downloader := s3manager.NewDownloader(sess)
+		return downloader, nil
+	}
+}
+
